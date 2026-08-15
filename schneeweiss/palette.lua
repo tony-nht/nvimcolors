@@ -1,0 +1,474 @@
+local lush = require("lush")
+
+local g = vim.g
+
+-- Instead of RGB where you specify red, green and blue components, HSL uses:
+--
+-- Hue        (0 - 360) (each value is a angle around the color wheel)
+-- Saturation (0 - 100) (0 is gray, 100 is colored)
+-- Lightness  (0 - 100) (0 is black, 100 is white)
+-- Note: Converting between colorspaces can introduce minor color differences
+--       due to floating point maths. You may prefer to manually adjust your
+--       colors "by eye" afterwards.
+
+-- ###
+-- ### HSL operations
+-- ###
+--
+-- Lush.hsl (and hsluv) provides a number of convenience functions for:
+--
+--   Relative adjustment (rotate(), saturate(), desaturate(), lighten(), darken())
+--   Absolute adjustment (prefix above with abs_)
+--   Combination         (mix())
+--   Overrides           (hue(), saturation(), lightness())
+--   Access              (.h, .s, .l)
+--   Coercion            (tostring(), "Concatination: " .. color)
+--   Helpers             (readable())
+--
+--   Adjustment functions have shortcut aliases, ro, sa, de, li, da
+--                                               abs_sa, abs_de, abs_li, abs_da
+--
+-- Because HSL colors are represented by degrees around a colorwheel, we can find
+-- harmonious colors from our original set by rotating the hue:
+
+local hsl = lush.hsl -- We'll use hsl a lot so its nice to bind it separately
+local schnee = hsl(23, 100, 100)
+local fg_p_0 = schnee -- Comments
+local fg_p_1 = schnee -- Functions and number
+local fg_p_2 = schnee -- String
+local fg_p_3 = schnee -- Keyword
+local fg_p_4 = schnee -- Type
+local fg_a = schnee -- you can just type them normally.
+local bg_a = hsl(229, 62, 30)
+
+local lfg = fg_a
+local lbg = bg_a
+
+local blue = "#1561b8"
+local green = "#1C5708"
+local light_green = "#dfeacc"
+local light_red = "#f2d3cd"
+local red = "#c4331d"
+local grey = "#5e5e5e"
+local pitch_black = "#000000"
+local border = "#cccccc"
+local highlight = "#eeeeee"
+local dark_yellow = "#b37f02"
+local yellow = "#f9db70"
+local light_yellow = "#f9eab3"
+local orange = "#a55000"
+local fg_p_5 = hsl(41, 46, 69) -- OIL directory items color
+local white = "#ffffff"
+local cyan = "#007872"
+
+local is_dark_theme = true
+local function make_contrastor(how_much, to_what)
+	local contrastor = nil
+	local c = nil
+	if to_what == "bg" then
+		c = lfg
+	elseif to_what == "fg" then
+		c = lbg
+	else
+		error("STUPID")
+	end
+	if is_dark_theme then
+		contrastor = function(color)
+			return color.mix(c, 50).lighten(how_much)
+		end
+	else
+		contrastor = function(color)
+			return color.mix(c, 50).darken(how_much)
+		end
+	end
+	return contrastor
+end
+
+local bgc = make_contrastor(27, "bg")
+local fgc = make_contrastor(6, "fg")
+
+local muter = make_contrastor(22, "fg")
+local lauter = make_contrastor(40, "bg")
+g.terminal_color_0 = fg_a
+g.terminal_color_1 = red
+g.terminal_color_2 = green
+g.terminal_color_3 = dark_yellow
+g.terminal_color_4 = blue
+g.terminal_color_5 = fg_p_5
+g.terminal_color_6 = cyan
+g.terminal_color_7 = white
+
+g.terminal_color_8 = fg_a
+g.terminal_color_9 = red
+g.terminal_color_10 = green
+g.terminal_color_11 = dark_yellow
+g.terminal_color_12 = blue
+g.terminal_color_13 = fg_p_5
+g.terminal_color_14 = cyan
+g.terminal_color_15 = bg_a
+
+local base = {
+	-- This highlight group can be used when one wants to disable a highlight
+	-- group using `winhl`
+	Disabled = {},
+	-- These highlight groups can be used for statuslines, for example when
+	-- displaying ALE warnings and errors.
+	BlackOnLightYellow = { fg = lfg, bg = light_yellow },
+	LightRedBackground = { bg = light_red },
+	WhiteOnBlue = { fg = white, bg = blue },
+	WhiteOnOrange = { fg = white, bg = orange },
+	WhiteOnRed = { fg = white, bg = red },
+	WhiteOnYellow = { fg = white, bg = dark_yellow },
+	Yellow = { fg = dark_yellow, bold = true },
+	Bold = { fg = lfg, bold = true },
+	Boolean = { link = "Keyword" },
+	Character = { link = "String" },
+	ColorColumn = { bg = highlight },
+	Conceal = {},
+	Constant = { fg = lfg },
+	Cursor = { bg = lfg },
+	Directory = { fg = fg_p_5 },
+	EndOfBuffer = { fg = lbg, bg = lbg },
+	Error = { link = "ErrorMsg" },
+	ErrorMsg = { fg = red, bold = true },
+	FoldColumn = { link = "Comment" },
+	Folded = { link = "Comment" },
+	Identifier = { fg = fg_a },
+	Function = { fg = fg_a },
+	IncSearch = { link = "Search" },
+	CurSearch = { link = "Search" },
+	Include = { fg = lfg, bold = true },
+	Label = { link = "Keyword" },
+	LineNr = { fg = grey },
+	Macro = { fg = orange },
+	MatchParen = { bold = true },
+	MoreMsg = { fg = lfg },
+	ModeMsg = { fg = lfg, bold = true },
+	MsgSeparator = { fg = border },
+	NonText = { fg = grey },
+	NormalFloat = { fg = lfg },
+	FloatTitle = { fg = lfg, bold = true },
+	FloatBorder = { fg = border },
+	Operator = { fg = lfg },
+	Pmenu = { fg = lfg, bg = lbg },
+	PmenuSbar = { bg = lbg },
+	PmenuSel = { bg = pitch_black, bold = true },
+	PmenuThumb = { bg = pitch_black },
+	PmenuMatch = { fg = dark_yellow, bold = true },
+	PreCondit = { link = "Macro" },
+	PreProc = { fg = lfg },
+	Question = { fg = lfg },
+	QuickFixLine = { bg = highlight, bold = true },
+	Regexp = { fg = orange },
+	Search = { bg = light_yellow },
+	SignColumn = { link = "FoldColumn" },
+	Special = { fg = lfg },
+	SpecialKey = { link = "Number" },
+	SpellBad = { sp = red, underline = true },
+	SpellCap = { sp = dark_yellow, underline = true },
+	SpellLocal = { sp = blue, underline = true },
+	SpellRare = { sp = fg_p_5, underline = true },
+	Statement = { link = "Keyword" },
+	StatusLine = { fg = lfg, bg = lbg },
+	StatusLineNC = { fg = lfg, bg = lbg },
+	StatusLineTab = { fg = lfg, bg = lbg, bold = true },
+	WinBar = { fg = lbg, bold = true },
+	WinBarNc = { fg = lbg, bold = true },
+	WinBarFill = { fg = border },
+	StorageClass = { link = "Keyword" },
+	String = { fg = green },
+	SnippetTabstop = {},
+	Symbol = { fg = orange },
+	TabLine = { fg = lfg, bg = pitch_black },
+	TabLineFill = { fg = lfg, bg = pitch_black },
+	TabLineSel = { fg = lfg, bg = lbg, bold = true },
+	Title = { fg = lfg, bold = true },
+	Todo = { fg = grey, bold = true },
+	Type = { link = "Constant" },
+	Underlined = { underline = true },
+	VertSplit = { fg = border },
+	WinSeparator = { fg = border },
+	Visual = { bg = pitch_black },
+	WarningMsg = { fg = dark_yellow, bold = true },
+	Whitespace = { fg = border },
+	WildMenu = { link = "PmenuSel" },
+	-- ALE
+	ALEError = { fg = red, bold = true },
+	ALEErrorSign = { fg = red, bold = true },
+	ALEWarning = { fg = dark_yellow, bold = true },
+	ALEWarningSign = { fg = dark_yellow, bold = true },
+	-- ccc.nvim
+	CccFloatNormal = { link = "NormalFloat" },
+	CccFloatBorder = { link = "FloatBorder" },
+	-- CSS
+	cssClassName = { link = "Keyword" },
+	cssColor = { link = "Number" },
+	cssIdentifier = { link = "Keyword" },
+	cssImportant = { link = "Keyword" },
+	cssProp = { link = "Identifier" },
+	cssTagName = { link = "Keyword" },
+	cssCustomProp = { fg = fg_p_5 },
+	cssPseudoClass = { fg = orange, bold = true },
+	cssPseudoClassId = { link = "cssPseudoClass" },
+	["@tag.css"] = { link = "cssIdentifier" },
+	["@type.css"] = { link = "cssClassName" },
+	["@variable.css"] = { link = "cssCustomProp" },
+	["@constant.css"] = { link = "cssTagName" },
+	-- Diffs
+	DiffAdd = { bg = light_green },
+	DiffChange = { bg = highlight },
+	DiffDelete = { fg = red },
+	DiffText = { bg = light_yellow },
+	diffAdded = { link = "DiffAdd" },
+	diffChanged = { link = "DiffChange" },
+	diffFile = { fg = lfg, bold = true },
+	diffLine = { fg = blue },
+	diffRemoved = { link = "DiffDelete" },
+	-- Dot/Graphviz
+	dotKeyChar = { link = "Operator" },
+	-- diffview.nvim
+	DiffviewCursorLine = { bold = true, bg = pitch_black },
+	DiffviewDiffAddAsDelete = { bg = light_red },
+	DiffviewDiffDelete = { fg = pitch_black },
+	DiffviewDiffDeleteDim = { fg = pitch_black },
+	DiffviewFilePanelFileName = { fg = lfg },
+	DiffviewFilePanelPath = { fg = fg_p_5 },
+	DiffviewFilePanelRootPath = { fg = fg_p_5 },
+	DiffviewFilePanelTitle = { fg = lfg, bold = true },
+	DiffviewFilePanelInsertions = { fg = green },
+	DiffviewFilePanelDeletions = { fg = red },
+	DiffviewStatusModified = { fg = dark_yellow, bold = true },
+	DiffviewStatusAdded = { fg = green, bold = true },
+	DiffviewStatusCopied = { fg = green, bold = true },
+	DiffviewStatusDeleted = { fg = red, bold = true },
+	-- Eyeliner
+	EyelinerPrimary = { fg = red, bold = true },
+	EyelinerSecondary = { fg = dark_yellow, bold = true },
+	EyelinerDimmed = { link = "Comment" },
+	-- Flash
+	FlashBackdrop = { link = "None" },
+	FlashLabel = { fg = lfg, bold = true, bg = yellow },
+	FlashPromptIcon = { bold = true },
+	-- Fugitive
+	FugitiveblameHash = { fg = fg_p_5 },
+	FugitiveblameTime = { fg = blue },
+	gitCommitOverflow = { link = "ErrorMsg" },
+	gitCommitSummary = { link = "String" },
+	-- gitcommit
+	["@string.special.url.gitcommit"] = { fg = lfg },
+	["@markup.link.gitcommit"] = { fg = green, bold = true },
+	["@comment.warning.gitcommit"] = { fg = red, bold = true },
+	-- Gitsigns
+	GitSignsAdd = { fg = border },
+	GitSignsDelete = { fg = border },
+	GitSignsChange = { fg = border },
+	GitSignsStagedAdd = { fg = grey },
+	GitSignsStagedDelete = { fg = grey },
+	GitSignsStagedChange = { fg = grey },
+	-- HAML
+	hamlClass = { fg = lfg },
+	hamlDocType = { link = "Comment" },
+	hamlId = { fg = lfg },
+	hamlTag = { fg = lfg, bold = true },
+	-- hop.nvim
+	HopNextKey = { fg = lfg, bold = true, bg = yellow },
+	HopNextKey1 = { bg = light_yellow },
+	HopNextKey2 = { bg = light_yellow },
+	HopUnmatched = {},
+	-- HTML
+	htmlArg = { link = "Identifier" },
+	htmlLink = { link = "Directory" },
+	htmlScriptTag = { link = "htmlTag" },
+	htmlSpecialTagName = { link = "htmlTag" },
+	htmlTag = { fg = lfg, bold = true },
+	htmlTagName = { link = "htmlTag" },
+	htmlItalic = { italic = true },
+	htmlBold = { bold = true },
+	-- Inko
+	inkoCommentBold = { fg = grey, bold = true },
+	inkoCommentInlineUrl = { link = "Number" },
+	inkoCommentItalic = { fg = grey, italic = true },
+	inkoCommentTitle = { fg = grey, bold = true },
+	inkoInstanceVariable = { link = "InstanceVariable" },
+	inkoKeywordArgument = { link = "Regexp" },
+	["@variable.member.inko"] = { link = "InstanceVariable" },
+	["@constant.builtin.inko"] = { link = "Keyword" },
+	-- Java
+	javaAnnotation = { link = "Directory" },
+	javaCommentTitle = { link = "javaComment" },
+	javaDocParam = { link = "Todo" },
+	javaDocTags = { link = "Todo" },
+	javaExternal = { link = "Keyword" },
+	javaStorageClass = { link = "Keyword" },
+	-- Javascript
+	JavaScriptNumber = { link = "Number" },
+	javaScriptBraces = { link = "Operator" },
+	javaScriptFunction = { link = "Keyword" },
+	javaScriptIdentifier = { link = "Keyword" },
+	javaScriptMember = { link = "Identifier" },
+	-- JSON
+	jsonKeyword = { link = "String" },
+	-- Lua
+	luaFunction = { link = "Keyword" },
+	-- LSP
+	DiagnosticUnderlineError = { underline = true, sp = red },
+	DiagnosticUnderlineWarn = { underline = true, sp = dark_yellow },
+	LspDiagnosticsUnderlineError = { link = "DiagnosticUnderlineError" },
+	LspDiagnosticsUnderlineWarning = { link = "DiagnosticUnderlineWarn" },
+	LspReferenceTarget = {},
+	DiagnosticFloatingError = { fg = red, bold = true },
+	DiagnosticFloatingHint = { fg = lfg, bold = true },
+	DiagnosticFloatingInfo = { fg = blue, bold = true },
+	DiagnosticFloatingWarn = { fg = dark_yellow, bold = true },
+	DiagnosticError = { fg = red, bold = true },
+	DiagnosticHint = { fg = grey, bold = true },
+	DiagnosticInfo = { fg = blue, bold = true },
+	DiagnosticWarn = { fg = dark_yellow, bold = true },
+	DiagnosticDeprecated = {},
+	-- Make
+	makeTarget = { link = "Function" },
+	-- Markdown
+	markdownCode = { link = "markdownCodeBlock" },
+	markdownCodeBlock = { link = "Comment" },
+	markdownListMarker = { link = "Keyword" },
+	markdownOrderedListMarker = { link = "Keyword" },
+	markdownUrl = { fg = blue },
+	-- mini.diff
+	MiniDiffSignAdd = { fg = border },
+	MiniDiffSignDelete = { fg = border },
+	MiniDiffSignChange = { fg = border },
+	-- mini.icons
+	MiniIconsAzure = { fg = blue },
+	MiniIconsBlue = { fg = blue },
+	MiniIconsCyan = { fg = cyan },
+	MiniIconsGreen = { fg = green },
+	MiniIconsGrey = { fg = grey },
+	MiniIconsOrange = { fg = orange },
+	MiniIconsPurple = { fg = fg_p_5 },
+	MiniIconsRed = { fg = red },
+	MiniIconsYellow = { fg = dark_yellow },
+	-- mini.jump2d
+	MiniJump2dSpot = { fg = red, bold = true },
+	MiniJump2dSpotAhead = { fg = red, bold = true },
+	-- mini.pick
+	MiniPickBorder = { fg = border },
+	MiniPickBorderBusy = { link = "MiniPickBorder" },
+	MiniPickBorderText = { link = "Comment" },
+	MiniPickHeader = { fg = lfg, bold = true },
+	MiniPickMatchCurrent = { bg = pitch_black, bold = true },
+	MiniPickMatchRanges = { fg = dark_yellow, bold = true },
+	MiniPickNormal = { fg = lfg },
+	MiniPickPrompt = { fg = lfg },
+	MiniPickMatchMarked = { bold = true },
+	MiniStatuslineModeNormal = { fg = lfg, bg = muter(bg_a) },
+	MiniStatuslineModeCommand = { fg = lfg, bg = muter(bg_a) },
+	-- Rust
+	rustCommentBlockDoc = { link = "Comment" },
+	rustCommentLineDoc = { link = "Comment" },
+	rustFuncCall = { link = "Identifier" },
+	rustModPath = { link = "Identifier" },
+	["@function.macro.rust"] = { link = "Macro" },
+	["@attribute.rust"] = { link = "Identifier" },
+	-- pounce.nvim
+	PounceAccept = { fg = lfg, bg = yellow, bold = true },
+	PounceAcceptBest = { link = "PounceAccept" },
+	PounceMatch = { bg = light_yellow },
+	PounceUnmatched = {},
+	PounceGap = { link = "None" },
+	-- Python
+	pythonOperator = { link = "Keyword" },
+	-- SASS
+	sassClass = { link = "cssClassName" },
+	sassId = { link = "cssIdentifier" },
+	-- Shell
+	shFunctionKey = { link = "Keyword" },
+	-- Snippy
+	SnippyPlaceholder = { link = "SnippetTabstop" },
+	-- SQL
+	sqlKeyword = { link = "Keyword" },
+	-- Typescript
+	typescriptBraces = { link = "Operator" },
+	typescriptEndColons = { link = "Operator" },
+	typescriptExceptions = { link = "Keyword" },
+	typescriptFuncKeyword = { link = "Keyword" },
+	typescriptFunction = { link = "Function" },
+	typescriptIdentifier = { link = "Identifier" },
+	typescriptLogicSymbols = { link = "Operator" },
+	-- Telescope
+	TelescopeBorder = { fg = border },
+	TelescopeMatching = { fg = dark_yellow, bold = true },
+	TelescopePromptNormal = { fg = lfg },
+	TelescopePromptBorder = { fg = border },
+	TelescopePromptPrefix = { fg = lfg, bold = true },
+	TelescopeSelection = { fg = "#000000", bg = white, bold = true },
+	TelescopeTitle = { fg = lfg, bold = true },
+	TelescopeNormal = { fg = lfg },
+	-- Treesitter
+	["@markup.link"] = { fg = blue },
+	["@property.json"] = { bold = true },
+	["@text.emphasis"] = { italic = true },
+	["@text.reference"] = { fg = fg_p_5 },
+	["@text.strong"] = { bold = true },
+	["@text.uri"] = { fg = blue },
+	["@punctuation"] = { fg = lfg },
+	["@keyword"] = { fg = lauter(fg_p_3), bold = true },
+	["@type"] = { fg = fg_p_4, bold = true },
+	["@type.builtin"] = { fg = muter(fg_p_4).li(22) },
+	["@operator"] = { fg = fg_p_4, bold = true },
+	["@variable"] = { fg = lfg },
+	["@variable.builtin"] = { bold = true },
+	["@constant"] = { fg = yellow, bold = true },
+	["@string.regexp"] = { link = "Regexp" },
+	["@function.call"] = { fg = fg_p_1 },
+	-- Custom Tree-sitter captures added by this theme.
+	["@variable.parameter.reference"] = { fg = orange },
+}
+
+---@diagnostic disable: undefined-global
+local theme = lush(function()
+	return {
+		-- Vim internals
+		Normal({ bg = bg_a, fg = fg_a }),
+		CursorLine({ bg = muter(Normal.bg).da(30) }), -- lighten() can also be called via li()
+		Visual({ fg = Normal.bg, bg = Normal.fg }), -- Try pressing v and selecting some text
+		Comment({ fg = muter(fg_p_0) }),
+		Number = { fg = fg_p_1 },
+		String({ fg = bgc(fg_p_2) }),
+		Function({ fg = fg_p_1 }),
+		CursorColumn({ CursorLine }),
+		OkMsg({ fg = hsl(159, 100, 30) }),
+		WarningMsg({ fg = hsl(28, 64, 37) }),
+		ErrorMsg({ fg = hsl(0, 100, 50) }),
+		LineNr({ Comment, gui = "italic" }),
+		LineNrBelow({ LineNr }),
+		LineNrAbove({ LineNr }),
+		CursorLineNr({ LineNr, fg = CursorLine.bg.mix(Normal.fg, 64) }),
+		search_base({ bg = hsl(52, 52, 52), fg = hsl(52, 10, 10) }),
+		Search({ search_base }),
+		IncSearch({ bg = search_base.bg.ro(-20), fg = search_base.fg.da(90) }),
+	}
+end)
+
+local norm_lush_theme = {}
+
+for k, v in pairs(theme) do
+	-- print("K:", k)
+	-- print("V:", v)
+	local t = {}
+	for kk, vv in pairs(v) do
+		-- print("KKKK:", kk)
+		-- print("VVVV:", vv)
+		t[tostring(kk)] = tostring(vv)
+	end
+	norm_lush_theme[tostring(k)] = t
+end
+
+-- print("111111111")
+-- print(vim.inspect(base))
+-- print(vim.inspect(theme))
+-- print(vim.inspect(norm_lush_theme))
+for k, v in pairs(norm_lush_theme) do
+	base[k] = v
+end
+
+return base

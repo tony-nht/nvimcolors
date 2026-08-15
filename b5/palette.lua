@@ -1,37 +1,6 @@
 local lush = require("lush")
 
-local o = vim.o
 local g = vim.g
-local api = vim.api
-
-vim.cmd("hi clear")
-
-if g.syntax_on == 1 then
-	vim.cmd("syntax reset")
-end
-
-o.background = "light"
-g.colors_name = "grey"
-
-local background = "#f2f2f2"
-local grey_bg_light = "#ececec"
-local black = "#000000"
-local blue = "#1561b8"
-local green = "#1C5708"
-local light_green = "#dfeacc"
-local light_red = "#f2d3cd"
-local red = "#c4331d"
-local grey = "#5e5e5e"
-local light_grey = "#e6e6e6"
-local border = "#cccccc"
-local highlight = "#eeeeee"
-local dark_yellow = "#b37f02"
-local yellow = "#f9db70"
-local light_yellow = "#f9eab3"
-local orange = "#a55000"
-local purple = "#5c21a5"
-local white = "#ffffff"
-local cyan = "#007872"
 
 -- Instead of RGB where you specify red, green and blue components, HSL uses:
 --
@@ -63,15 +32,43 @@ local cyan = "#007872"
 -- harmonious colors from our original set by rotating the hue:
 
 local hsl = lush.hsl -- We'll use hsl a lot so its nice to bind it separately
-local water = hsl(208, 100, 80) -- Vim has a mapping, <n>C-a and <n>C-x to
-local water_deep = hsl(208, 90, 30) -- increment or decrement integers, or
-local water_abyss = hsl(146, 90, 10) -- you can just type them normally.
-local sea_gull = hsl("#efefef")
+local lush_fg = hsl(83, 43, 88) -- you can just type them normally.
+local lush_bg = hsl(253, 62, 15)
 
-local leaf = hsl(150, 100, 30)
-local wood = hsl(351, 100, 37)
+local lfg = lush_fg
+local lbg = lush_bg
+local background = lush_bg
 
-g.terminal_color_0 = black
+local p_variable = lush_fg
+local p_operator = p_variable
+local p_type = p_variable
+local p_parameter = p_variable
+local p_number = p_variable
+local p_constant = p_variable
+local p_string = p_variable
+local p_keyword = p_variable
+local p_function = p_variable
+local p_comment = p_variable
+
+local grey_bg_light = "#000000"
+local blue = "#1561b8"
+local green = "#1C5708"
+local light_green = "#dfeacc"
+local light_red = "#f2d3cd"
+local red = "#c4331d"
+local grey = "#5e5e5e"
+local pitch_black = "#000000"
+local border = "#cccccc"
+local highlight = "#eeeeee"
+local dark_yellow = "#b37f02"
+local yellow = "#f9db70"
+local light_yellow = "#f9eab3"
+local orange = "#a55000"
+local purple = hsl(57, 86, 66)
+local white = "#ffffff"
+local cyan = "#007872"
+
+g.terminal_color_0 = lush_fg
 g.terminal_color_1 = red
 g.terminal_color_2 = green
 g.terminal_color_3 = dark_yellow
@@ -80,14 +77,14 @@ g.terminal_color_5 = purple
 g.terminal_color_6 = cyan
 g.terminal_color_7 = white
 
-g.terminal_color_8 = black
+g.terminal_color_8 = lush_fg
 g.terminal_color_9 = red
 g.terminal_color_10 = green
 g.terminal_color_11 = dark_yellow
 g.terminal_color_12 = blue
 g.terminal_color_13 = purple
 g.terminal_color_14 = cyan
-g.terminal_color_15 = white
+g.terminal_color_15 = lush_bg
 
 local base = {
 	-- This highlight group can be used when one wants to disable a highlight
@@ -95,90 +92,83 @@ local base = {
 	Disabled = {},
 	-- These highlight groups can be used for statuslines, for example when
 	-- displaying ALE warnings and errors.
-	BlackOnLightYellow = { fg = black, bg = light_yellow },
+	BlackOnLightYellow = { fg = lfg, bg = light_yellow },
 	LightRedBackground = { bg = light_red },
 	WhiteOnBlue = { fg = white, bg = blue },
 	WhiteOnOrange = { fg = white, bg = orange },
 	WhiteOnRed = { fg = white, bg = red },
 	WhiteOnYellow = { fg = white, bg = dark_yellow },
 	Yellow = { fg = dark_yellow, bold = true },
-	Bold = { fg = black, bold = true },
+	Bold = { fg = lfg, bold = true },
 	Boolean = { link = "Keyword" },
 	Character = { link = "String" },
 	ColorColumn = { bg = highlight },
-	Comment = { fg = grey },
 	Conceal = {},
-	Constant = { fg = black },
-	Cursor = { bg = black },
-	-- This is to work around https://github.com/neovim/neovim/issues/9800.
-	CursorLine = { ctermfg = "black" },
-	CursorLineNr = { fg = black, bold = true },
+	Constant = { fg = lfg },
+	Cursor = { bg = lfg },
 	Directory = { fg = purple },
 	EndOfBuffer = { fg = background, bg = background },
 	Error = { link = "ErrorMsg" },
 	ErrorMsg = { fg = red, bold = true },
 	FoldColumn = { link = "Comment" },
 	Folded = { link = "Comment" },
-	Identifier = { fg = black },
-	Function = { fg = black },
+	Identifier = { fg = lush_fg },
+	Function = { fg = lush_fg },
 	IncSearch = { link = "Search" },
 	CurSearch = { link = "Search" },
-	Include = { fg = black, bold = true },
-	InstanceVariable = { fg = purple },
-	Keyword = { fg = black, bold = true },
+	Include = { fg = lfg, bold = true },
+	Keyword = { fg = lfg, bold = true },
 	Label = { link = "Keyword" },
 	LineNr = { fg = grey },
 	Macro = { fg = orange },
 	MatchParen = { bold = true },
-	MoreMsg = { fg = black },
-	ModeMsg = { fg = black, bold = true },
+	MoreMsg = { fg = lfg },
+	ModeMsg = { fg = lfg, bold = true },
 	MsgSeparator = { fg = border },
 	NonText = { fg = grey },
-	Normal = { fg = black, bg = background },
-	NormalFloat = { fg = black },
-	FloatTitle = { fg = black, bold = true },
+	NormalFloat = { fg = lfg },
+	FloatTitle = { fg = lfg, bold = true },
 	FloatBorder = { fg = border },
-	Number = { fg = blue },
-	Operator = { fg = black },
-	Pmenu = { fg = black, bg = grey_bg_light },
+	Operator = { fg = lfg },
+	Pmenu = { fg = lfg, bg = lbg },
 	PmenuSbar = { bg = grey_bg_light },
-	PmenuSel = { bg = light_grey, bold = true },
-	PmenuThumb = { bg = light_grey },
+	PmenuSel = { bg = pitch_black, bold = true },
+	PmenuThumb = { bg = pitch_black },
 	PmenuMatch = { fg = dark_yellow, bold = true },
 	PreCondit = { link = "Macro" },
-	PreProc = { fg = black },
-	Question = { fg = black },
+	PreProc = { fg = lfg },
+	Question = { fg = lfg },
 	QuickFixLine = { bg = highlight, bold = true },
 	Regexp = { fg = orange },
 	Search = { bg = light_yellow },
 	SignColumn = { link = "FoldColumn" },
-	Special = { fg = black },
+	Special = { fg = lfg },
 	SpecialKey = { link = "Number" },
 	SpellBad = { sp = red, underline = true },
 	SpellCap = { sp = dark_yellow, underline = true },
 	SpellLocal = { sp = blue, underline = true },
 	SpellRare = { sp = purple, underline = true },
 	Statement = { link = "Keyword" },
-	StatusLine = { fg = black, bg = background },
-	StatusLineNC = { fg = black, bg = grey_bg_light },
-	StatusLineTab = { fg = black, bg = background, bold = true },
-	WinBar = { fg = black, bold = true },
-	WinBarNc = { fg = black, bold = true },
+	StatusLine = { fg = lfg, bg = lbg },
+	StatusLineNC = { fg = lfg, bg = grey_bg_light },
+	StatusLineTab = { fg = lfg, bg = lbg, bold = true },
+	WinBar = { fg = lbg, bold = true },
+	WinBarNc = { fg = lbg, bold = true },
 	WinBarFill = { fg = border },
 	StorageClass = { link = "Keyword" },
 	String = { fg = green },
 	SnippetTabstop = {},
 	Symbol = { fg = orange },
-	TabLine = { fg = black, bg = light_grey },
-	TabLineFill = { fg = black, bg = light_grey },
-	TabLineSel = { fg = black, bg = background, bold = true },
-	Title = { fg = black, bold = true },
+	TabLine = { fg = lfg, bg = pitch_black },
+	TabLineFill = { fg = lfg, bg = pitch_black },
+	TabLineSel = { fg = lfg, bg = background, bold = true },
+	Title = { fg = lfg, bold = true },
 	Todo = { fg = grey, bold = true },
 	Type = { link = "Constant" },
 	Underlined = { underline = true },
 	VertSplit = { fg = border },
 	WinSeparator = { fg = border },
-	Visual = { bg = light_grey },
+	Visual = { bg = pitch_black },
 	WarningMsg = { fg = dark_yellow, bold = true },
 	Whitespace = { fg = border },
 	WildMenu = { link = "PmenuSel" },
@@ -211,20 +201,20 @@ local base = {
 	DiffText = { bg = light_yellow },
 	diffAdded = { link = "DiffAdd" },
 	diffChanged = { link = "DiffChange" },
-	diffFile = { fg = black, bold = true },
+	diffFile = { fg = lfg, bold = true },
 	diffLine = { fg = blue },
 	diffRemoved = { link = "DiffDelete" },
 	-- Dot/Graphviz
 	dotKeyChar = { link = "Operator" },
 	-- diffview.nvim
-	DiffviewCursorLine = { bold = true, bg = light_grey },
+	DiffviewCursorLine = { bold = true, bg = pitch_black },
 	DiffviewDiffAddAsDelete = { bg = light_red },
-	DiffviewDiffDelete = { fg = light_grey },
-	DiffviewDiffDeleteDim = { fg = light_grey },
-	DiffviewFilePanelFileName = { fg = black },
+	DiffviewDiffDelete = { fg = pitch_black },
+	DiffviewDiffDeleteDim = { fg = pitch_black },
+	DiffviewFilePanelFileName = { fg = lfg },
 	DiffviewFilePanelPath = { fg = purple },
 	DiffviewFilePanelRootPath = { fg = purple },
-	DiffviewFilePanelTitle = { fg = black, bold = true },
+	DiffviewFilePanelTitle = { fg = lfg, bold = true },
 	DiffviewFilePanelInsertions = { fg = green },
 	DiffviewFilePanelDeletions = { fg = red },
 	DiffviewStatusModified = { fg = dark_yellow, bold = true },
@@ -237,7 +227,7 @@ local base = {
 	EyelinerDimmed = { link = "Comment" },
 	-- Flash
 	FlashBackdrop = { link = "None" },
-	FlashLabel = { fg = black, bold = true, bg = yellow },
+	FlashLabel = { fg = lfg, bold = true, bg = yellow },
 	FlashPromptIcon = { bold = true },
 	-- Fugitive
 	FugitiveblameHash = { fg = purple },
@@ -245,7 +235,7 @@ local base = {
 	gitCommitOverflow = { link = "ErrorMsg" },
 	gitCommitSummary = { link = "String" },
 	-- gitcommit
-	["@string.special.url.gitcommit"] = { fg = black },
+	["@string.special.url.gitcommit"] = { fg = lfg },
 	["@markup.link.gitcommit"] = { fg = green, bold = true },
 	["@comment.warning.gitcommit"] = { fg = red, bold = true },
 	-- Gitsigns
@@ -256,12 +246,12 @@ local base = {
 	GitSignsStagedDelete = { fg = grey },
 	GitSignsStagedChange = { fg = grey },
 	-- HAML
-	hamlClass = { fg = black },
+	hamlClass = { fg = lfg },
 	hamlDocType = { link = "Comment" },
-	hamlId = { fg = black },
-	hamlTag = { fg = black, bold = true },
+	hamlId = { fg = lfg },
+	hamlTag = { fg = lfg, bold = true },
 	-- hop.nvim
-	HopNextKey = { fg = black, bold = true, bg = yellow },
+	HopNextKey = { fg = lfg, bold = true, bg = yellow },
 	HopNextKey1 = { bg = light_yellow },
 	HopNextKey2 = { bg = light_yellow },
 	HopUnmatched = {},
@@ -270,7 +260,7 @@ local base = {
 	htmlLink = { link = "Directory" },
 	htmlScriptTag = { link = "htmlTag" },
 	htmlSpecialTagName = { link = "htmlTag" },
-	htmlTag = { fg = black, bold = true },
+	htmlTag = { fg = lfg, bold = true },
 	htmlTagName = { link = "htmlTag" },
 	htmlItalic = { italic = true },
 	htmlBold = { bold = true },
@@ -307,7 +297,7 @@ local base = {
 	LspDiagnosticsUnderlineWarning = { link = "DiagnosticUnderlineWarn" },
 	LspReferenceTarget = {},
 	DiagnosticFloatingError = { fg = red, bold = true },
-	DiagnosticFloatingHint = { fg = black, bold = true },
+	DiagnosticFloatingHint = { fg = lfg, bold = true },
 	DiagnosticFloatingInfo = { fg = blue, bold = true },
 	DiagnosticFloatingWarn = { fg = dark_yellow, bold = true },
 	DiagnosticError = { fg = red, bold = true },
@@ -344,100 +334,14 @@ local base = {
 	MiniPickBorder = { fg = border },
 	MiniPickBorderBusy = { link = "MiniPickBorder" },
 	MiniPickBorderText = { link = "Comment" },
-	MiniPickHeader = { fg = black, bold = true },
-	MiniPickMatchCurrent = { bg = light_grey, bold = true },
+	MiniPickHeader = { fg = lfg, bold = true },
+	MiniPickMatchCurrent = { bg = pitch_black, bold = true },
 	MiniPickMatchRanges = { fg = dark_yellow, bold = true },
-	MiniPickNormal = { fg = black },
-	MiniPickPrompt = { fg = black },
+	MiniPickNormal = { fg = lfg },
+	MiniPickPrompt = { fg = lfg },
 	MiniPickMatchMarked = { bold = true },
-	-- netrw
-	netrwClassify = { link = "Identifier" },
-	-- Neogit
-	NeogitBranch = { fg = green, bold = true },
-	NeogitBranchHead = { link = "NeogitBranch" },
-	NeogitCommitViewHeader = { fg = dark_yellow, bold = true },
-	NeogitCursorLine = { bg = highlight },
-	NeogitDiffAdd = { link = "DiffAdd" },
-	NeogitDiffAddHighlight = { link = "NeogitDiffAdd" },
-	NeogitDiffContext = { link = "Normal" },
-	NeogitDiffContextHighlight = { link = "Normal" },
-	NeogitDiffDelete = { link = "DiffDelete" },
-	NeogitDiffDeleteHighlight = { link = "NeogitDiffDelete" },
-	NeogitDiffHeader = { fg = black, bold = true },
-	NeogitDiffHeaderHighlight = { link = "NeogitDiffHeader" },
-	NeogitFilePath = { fg = purple },
-	NeogitGraphBlue = { fg = blue },
-	NeogitGraphBoldBlue = { fg = blue, bold = true },
-	NeogitGraphBoldCyan = { fg = cyan, bold = true },
-	NeogitGraphBoldGray = { fg = grey, bold = true },
-	NeogitGraphBoldGreen = { fg = green, bold = true },
-	NeogitGraphBoldOrange = { fg = orange, bold = true },
-	NeogitGraphBoldPurple = { fg = purple, bold = true },
-	NeogitGraphBoldRed = { fg = red, bold = true },
-	NeogitGraphBoldWhite = { fg = black, bold = true },
-	NeogitGraphBoldYellow = { fg = dark_yellow, bold = true },
-	NeogitGraphCyan = { fg = cyan },
-	NeogitGraphGray = { fg = grey },
-	NeogitGraphGreen = { fg = green },
-	NeogitGraphOrange = { fg = orange },
-	NeogitGraphPurple = { fg = purple },
-	NeogitGraphRed = { fg = red },
-	NeogitGraphWhite = { fg = black },
-	NeogitGraphYellow = { fg = dark_yellow },
-	NeogitHunkHeader = { fg = blue },
-	NeogitHunkHeaderHighlight = { link = "NeogitHunkHeader" },
-	NeogitPopupActionKey = { link = "NeogitPopupOptionKey" },
-	NeogitPopupBranchName = { link = "NeogitBranch" },
-	NeogitPopupConfigEnabled = { link = "NeogitPopupOptionEnabled" },
-	NeogitPopupConfigKey = { link = "NeogitPopupOptionKey" },
-	NeogitPopupOptionEnabled = { bg = light_green, bold = true },
-	NeogitPopupOptionKey = { bold = true },
-	NeogitPopupSectionTitle = { link = "Title" },
-	NeogitPopupSwitchEnabled = { link = "NeogitPopupOptionEnabled" },
-	NeogitPopupSwitchKey = { link = "NeogitPopupOptionKey" },
-	NeogitRemote = { link = "NeogitBranch" },
-	-- Notify
-	NotifyDEBUGBorder = { fg = border },
-	NotifyDEBUGIcon = { fg = grey },
-	NotifyDEBUGTitle = { fg = grey },
-	NotifyERRORBorder = { fg = border },
-	NotifyERRORIcon = { fg = red },
-	NotifyERRORTitle = { fg = red },
-	NotifyINFOBorder = { fg = border },
-	NotifyINFOTitle = { fg = green },
-	NotifyINFOIcon = { fg = green },
-	NotifyTRACEBorder = { fg = border },
-	NotifyTRACEIcon = { fg = purple },
-	NotifyTRACETitle = { fg = purple },
-	NotifyWARNBorder = { fg = border },
-	NotifyWARNIcon = { fg = orange },
-	NotifyWARNTitle = { fg = orange },
-	-- Perl
-	perlPackageDecl = { link = "Identifier" },
-	perlStatementInclude = { link = "Statement" },
-	perlStatementPackage = { link = "Statement" },
-	podCmdText = { link = "Todo" },
-	podCommand = { link = "Comment" },
-	podVerbatimLine = { link = "Todo" },
-	-- Ruby
-	rubyAttribute = { link = "Identifier" },
-	rubyClass = { link = "Keyword" },
-	rubyClassVariable = { link = "rubyInstancevariable" },
-	rubyConstant = { link = "Constant" },
-	rubyDefine = { link = "Keyword" },
-	rubyFunction = { link = "Function" },
-	rubyInstanceVariable = { link = "InstanceVariable" },
-	rubyMacro = { link = "Identifier" },
-	rubyModule = { link = "rubyClass" },
-	rubyRegexp = { link = "Regexp" },
-	rubyRegexpCharClass = { link = "Regexp" },
-	rubyRegexpDelimiter = { link = "Regexp" },
-	rubyRegexpQuantifier = { link = "Regexp" },
-	rubyRegexpSpecial = { link = "Regexp" },
-	rubyStringDelimiter = { link = "String" },
-	rubySymbol = { link = "Symbol" },
-	["@variable.member.ruby"] = { link = "InstanceVariable" },
-	["@string.special.symbol.ruby"] = { link = "rubySymbol" },
+	MiniStatuslineModeNormal = { fg = white, bg = p_string.da(51) },
+	MiniStatuslineModeCommand = { fg = white, bg = p_keyword.da(51) },
 	-- Rust
 	rustCommentBlockDoc = { link = "Comment" },
 	rustCommentLineDoc = { link = "Comment" },
@@ -446,7 +350,7 @@ local base = {
 	["@function.macro.rust"] = { link = "Macro" },
 	["@attribute.rust"] = { link = "Identifier" },
 	-- pounce.nvim
-	PounceAccept = { fg = black, bg = yellow, bold = true },
+	PounceAccept = { fg = lfg, bg = yellow, bold = true },
 	PounceAcceptBest = { link = "PounceAccept" },
 	PounceMatch = { bg = light_yellow },
 	PounceUnmatched = {},
@@ -458,15 +362,6 @@ local base = {
 	sassId = { link = "cssIdentifier" },
 	-- Shell
 	shFunctionKey = { link = "Keyword" },
-	-- Snacks
-	SnacksPickerMatch = { fg = dark_yellow, bold = true },
-	SnacksPickerDir = { fg = black },
-	SnacksPickerPrompt = { fg = black, bold = true },
-	SnacksInputBorder = { link = "FloatBorder" },
-	SnacksInputTitle = { link = "Title" },
-	SnacksPickerRow = { link = "Number" },
-	SnacksPickerCol = { link = "Number" },
-	SnacksPickerListCursorLine = { bg = light_grey, bold = true },
 	-- Snippy
 	SnippyPlaceholder = { link = "SnippetTabstop" },
 	-- SQL
@@ -482,51 +377,63 @@ local base = {
 	-- Telescope
 	TelescopeBorder = { fg = border },
 	TelescopeMatching = { fg = dark_yellow, bold = true },
-	TelescopePromptNormal = { fg = black },
+	TelescopePromptNormal = { fg = lfg },
 	TelescopePromptBorder = { fg = border },
-	TelescopePromptPrefix = { fg = black, bold = true },
-	TelescopeSelection = { bg = light_grey, bold = true },
-	TelescopeTitle = { fg = black, bold = true },
-	TelescopeNormal = { fg = black },
+	TelescopePromptPrefix = { fg = lfg, bold = true },
+	TelescopeSelection = { bg = p_string.da(70), bold = true },
+	TelescopeTitle = { fg = lfg, bold = true },
+	TelescopeNormal = { fg = lfg },
+	-- Treesitter
 	-- Treesitter
 	["@markup.link"] = { fg = blue },
 	["@property.json"] = { bold = true },
 	["@text.emphasis"] = { italic = true },
-	["@text.reference"] = { fg = purple },
+	["@text.reference"] = { fg = p_string },
 	["@text.strong"] = { bold = true },
 	["@text.uri"] = { fg = blue },
+	["@variable"] = { fg = p_variable },
+	["@variable.member"] = { fg = p_variable },
+	["@property"] = { fg = p_variable },
+	["@punctuation"] = { fg = lfg },
 	["@variable.builtin"] = { bold = true },
+	["@string"] = { fg = p_string, bold = false },
 	["@string.regexp"] = { link = "Regexp" },
+	["@constant"] = { fg = p_constant, bold = true },
+	["@constant.builtin"] = { fg = p_number, bold = true },
+	["@number"] = { fg = p_number, bold = true },
+	["@variable.parameter"] = { fg = p_parameter, bold = true },
+	["@operator"] = { fg = p_operator },
+	["@type"] = { fg = p_type, bold = true },
+	["@type.builtin"] = { fg = p_type, bold = true },
+	["@function.call"] = { fg = p_function, bold = true },
+	["@spell"] = { fg = p_variable },
+	["@comment"] = { fg = p_variable },
 	-- Custom Tree-sitter captures added by this theme.
 	["@variable.parameter.reference"] = { fg = orange },
-	-- Vimscript
-	VimCommentTitle = { link = "Todo" },
-	VimIsCommand = { link = "Constant" },
-	vimGroup = { link = "Constant" },
-	vimHiGroup = { link = "Constant" },
-	-- XML
-	xmlAttrib = { link = "Identifier" },
-	xmlTag = { link = "Identifier" },
-	xmlTagName = { link = "Identifier" },
-	-- YAML
-	yamlPlainScalar = { link = "String" },
-	-- YARD
-	yardComment = { link = "Comment" },
-	yardType = { link = "Todo" },
-	yardTypeList = { link = "Todo" },
+	-- org mode basic
+	["@org.headline.level1"] = { fg = p_string },
+	["@org.headline.level2"] = { fg = p_comment },
+	["@org.headline.level3"] = { fg = p_function },
+	["@org.headline.level4"] = { fg = orange },
+	["@org.headline.level5"] = { fg = yellow },
+	["@org.tag"] = { fg = p_keyword },
+	["@org.hyperlink"] = { fg = p_function },
+	["@org.hyperlink.url"] = { fg = p_function },
+	["@org.hyperlink.desc"] = { fg = p_function },
 }
 
 ---@diagnostic disable: undefined-global
 local theme = lush(function()
 	return {
 		-- Vim internals
-		Normal({ bg = sea_gull, fg = water_abyss }), -- Goodbye gray, hello blue!
-		CursorLine({ bg = Normal.bg.darken(12) }), -- lighten() can also be called via li()
+		Normal({ bg = lush_bg, fg = lush_fg }),
+		CursorLine({ bg = Normal.bg.ro(98).li(20) }), -- lighten() can also be called via li()
 		Visual({ fg = Normal.bg, bg = Normal.fg }), -- Try pressing v and selecting some text
-		Comment({ fg = water.de(47).da(43) }),
-		Keyword({ fg = wood }),
-		String({ fg = leaf.sa(49).da(25) }),
-		Function({ fg = water_deep }),
+		Comment({ fg = p_comment }),
+		Keyword({ fg = p_keyword }),
+		Number = { fg = p_function },
+		String({ fg = p_string }),
+		Function({ fg = p_function }),
 		CursorColumn({ CursorLine }),
 		OkMsg({ fg = hsl(159, 100, 30) }),
 		WarningMsg({ fg = hsl(28, 64, 37) }),
@@ -535,18 +442,21 @@ local theme = lush(function()
 		LineNrBelow({ LineNr }),
 		LineNrAbove({ LineNr }),
 		CursorLineNr({ LineNr, fg = CursorLine.bg.mix(Normal.fg, 64) }),
+		search_base({ bg = hsl(129, 68, 67), fg = hsl(52, 10, 10) }),
+		Search({ search_base }),
+		IncSearch({ bg = search_base.bg.ro(-20), fg = search_base.fg.da(90) }),
 	}
 end)
 
 local norm_lush_theme = {}
 
 for k, v in pairs(theme) do
-	print("K:", k)
-	print("V:", v)
+	-- print("K:", k)
+	-- print("V:", v)
 	local t = {}
 	for kk, vv in pairs(v) do
-		print("KKKK:", kk)
-		print("VVVV:", vv)
+		-- print("KKKK:", kk)
+		-- print("VVVV:", vv)
 		t[tostring(kk)] = tostring(vv)
 	end
 	norm_lush_theme[tostring(k)] = t
