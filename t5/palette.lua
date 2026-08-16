@@ -32,40 +32,42 @@ local g = vim.g
 -- harmonious colors from our original set by rotating the hue:
 
 local hsl = lush.hsl -- We'll use hsl a lot so its nice to bind it separately
-local lush_fg = hsl(83, 43, 15) -- you can just type them normally.
-local lush_bg = hsl(253, 62, 89)
+local p_main_fg = hsl(207, 100, 82)
+local lush_fg = p_main_fg
+-- local p_main_fg = hsl(83, 49, 79) -- you can just type them normally.  @ALT1
+local lush_bg = hsl(200, 51, 15)
 
 local lfg = lush_fg
 local lbg = lush_bg
 local background = lush_bg
 
-local p_blue = hsl(212, 94, 41)
-local p_variable = lush_fg
-local p_operator = p_variable
-local p_type = p_variable
-local p_parameter = p_variable
-local p_number = p_variable
-local p_constant = p_variable
-local p_string = p_blue
-local p_keyword = p_variable
-local p_function = p_blue
-local p_comment = hsl(213, 62, 36)
+local p_variable = p_main_fg
+local p_operator = p_main_fg
+local p_type = hsl(290, 70, 79)
+-- local p_parameter = hsl(211, 100, 87)
+local p_parameter = p_main_fg
+local p_number = hsl(135, 100, 80)
+local p_constant = hsl(20, 100, 79)
+local p_string = hsl(163, 100, 53)
+local p_keyword = hsl(242, 101, 80)
+local p_function = p_main_fg
+local p_comment = hsl(204, 100, 61)
 
 local grey_bg_light = "#000000"
 local blue = "#1561b8"
 local green = "#1C5708"
-local light_green = "#dfeacc"
+local light_green = green
 local light_red = "#f2d3cd"
 local red = "#c4331d"
-local grey = p_function
+local grey = "#5e5e5e"
 local pitch_black = "#000000"
-local border = "#000000"
+local border = "#cccccc"
 local highlight = "#eeeeee"
 local dark_yellow = "#b37f02"
 local yellow = "#f9db70"
 local light_yellow = "#f9eab3"
-local orange = "#a55000"
-local purple = hsl(214, 86, 31)
+local orange = hsl(30, 80, 50)
+local purple = p_keyword -- Would mark folder names in Oil buffer
 local white = "#ffffff"
 local cyan = "#007872"
 
@@ -131,6 +133,11 @@ local base = {
 	FloatTitle = { fg = lfg, bold = true },
 	FloatBorder = { fg = border },
 	Operator = { fg = lfg },
+	Pmenu = { fg = lfg, bg = lbg },
+	PmenuSbar = { bg = grey_bg_light },
+	PmenuSel = { bg = green, bold = true },
+	PmenuThumb = { bg = pitch_black },
+	PmenuMatch = { fg = dark_yellow, bold = true },
 	PreCondit = { link = "Macro" },
 	PreProc = { fg = lfg },
 	Question = { fg = lfg },
@@ -145,14 +152,14 @@ local base = {
 	SpellLocal = { sp = blue, underline = true },
 	SpellRare = { sp = purple, underline = true },
 	Statement = { link = "Keyword" },
-	StatusLine = { fg = white, bg = blue },
-	StatusLineNC = { fg = white, bg = blue },
-	StatusLineTab = { fg = white, bg = blue, bold = true },
+	StatusLine = { fg = lfg, bg = lbg },
+	StatusLineNC = { fg = lfg, bg = grey_bg_light },
+	StatusLineTab = { fg = lfg, bg = lbg, bold = true },
 	WinBar = { fg = lbg, bold = true },
 	WinBarNc = { fg = lbg, bold = true },
 	WinBarFill = { fg = border },
 	StorageClass = { link = "Keyword" },
-	String = { fg = light_green },
+	String = { fg = green },
 	SnippetTabstop = {},
 	Symbol = { fg = orange },
 	TabLine = { fg = lfg, bg = pitch_black },
@@ -167,12 +174,7 @@ local base = {
 	Visual = { bg = pitch_black },
 	WarningMsg = { fg = dark_yellow, bold = true },
 	Whitespace = { fg = border },
-	Pmenu = { fg = lfg, bg = lbg },
-	PmenuSbar = { bg = grey_bg_light },
-	PmenuThumb = { bg = pitch_black },
-	PmenuSel = { fg = p_blue, background = white },
-	PmenuMatch = { fg = red },
-	WildMenu = { fg = pitch_black, bg = white, bold = true },
+	WildMenu = { link = "PmenuSel" },
 	-- ALE
 	ALEError = { fg = red, bold = true },
 	ALEErrorSign = { fg = red, bold = true },
@@ -196,14 +198,14 @@ local base = {
 	["@variable.css"] = { link = "cssCustomProp" },
 	["@constant.css"] = { link = "cssTagName" },
 	-- Diffs
-	DiffAdd = { bg = green },
+	DiffAdd = { bg = light_green },
 	DiffChange = { bg = highlight },
 	DiffDelete = { fg = red },
 	DiffText = { bg = light_yellow },
 	diffAdded = { link = "DiffAdd" },
 	diffChanged = { link = "DiffChange" },
 	diffFile = { fg = lfg, bold = true },
-	diffLine = { fg = blue },
+	diffLine = { fg = p_string },
 	diffRemoved = { link = "DiffDelete" },
 	-- Dot/Graphviz
 	dotKeyChar = { link = "Operator" },
@@ -338,13 +340,14 @@ local base = {
 	MiniPickHeader = { fg = lfg, bold = true },
 	MiniPickMatchCurrent = { bg = pitch_black, bold = true },
 	MiniPickMatchRanges = { fg = dark_yellow, bold = true },
-	MiniPickNormal = { fg = white },
-	MiniPickPrompt = { fg = white },
+	MiniPickNormal = { fg = lfg },
+	MiniPickPrompt = { fg = lfg },
 	MiniPickMatchMarked = { bold = true },
 	MiniStatuslineModeNormal = { fg = white, bg = red },
+	MiniStatusLineModeInsert = { fg = white, bg = blue },
 	MiniStatuslineModeCommand = { fg = white, bg = red },
-	MiniStatuslineFilename = { fg = white, bg = p_blue },
-	MiniStatuslineFileinfo = { fg = white, bg = red },
+	MiniStatuslineFilename = { fg = white, bg = green },
+	MiniStatuslineFileinfo = { fg = lfg, bg = lbg },
 	-- Rust
 	rustCommentBlockDoc = { link = "Comment" },
 	rustCommentLineDoc = { link = "Comment" },
@@ -379,11 +382,11 @@ local base = {
 	typescriptLogicSymbols = { link = "Operator" },
 	-- Telescope
 	TelescopeBorder = { fg = border },
-	TelescopeMatching = { fg = dark_yellow, bold = true },
+	TelescopeMatching = { fg = p_keyword, bold = true },
 	TelescopePromptNormal = { fg = lfg },
 	TelescopePromptBorder = { fg = border },
 	TelescopePromptPrefix = { fg = lfg, bold = true },
-	TelescopeSelection = { fg = white, bg = blue, bold = true },
+	TelescopeSelection = { bg = p_string.da(60), bold = true },
 	TelescopeTitle = { fg = lfg, bold = true },
 	TelescopeNormal = { fg = lfg },
 	-- Treesitter
@@ -395,12 +398,12 @@ local base = {
 	["@text.strong"] = { bold = true },
 	["@text.uri"] = { fg = blue },
 	["@variable"] = { fg = p_variable },
-	["@keyword"] = { fg = p_keyword, bold = true },
 	["@variable.member"] = { fg = p_variable },
 	["@property"] = { fg = p_variable },
 	["@punctuation"] = { fg = lfg },
 	["@variable.builtin"] = { bold = true },
 	["@string"] = { fg = p_string, bold = false },
+	["@string.escape"] = { fg = yellow, bold = false },
 	["@string.regexp"] = { link = "Regexp" },
 	["@constant"] = { fg = p_constant, bold = true },
 	["@constant.builtin"] = { fg = p_number, bold = true },
@@ -409,19 +412,18 @@ local base = {
 	["@operator"] = { fg = p_operator },
 	["@type"] = { fg = p_type, bold = true },
 	["@type.builtin"] = { fg = p_type, bold = true },
+	["@keyword"] = { fg = p_keyword, bold = true },
 	["@function"] = { fg = p_function, bold = true },
-	["@function.call"] = { fg = p_function },
-	["@spell"] = { fg = p_variable },
-	["@comment"] = { fg = p_comment },
+	-- ["@function.call"] = { fg = p_function },
 	-- Custom Tree-sitter captures added by this theme.
 	["@variable.parameter.reference"] = { fg = orange },
 	-- org mode basic
 	["@org.headline.level1"] = { fg = p_string },
-	["@org.headline.level2"] = { fg = p_comment },
+	["@org.headline.level2"] = { fg = p_constant },
 	["@org.headline.level3"] = { fg = p_function },
-	["@org.headline.level4"] = { fg = orange },
-	["@org.headline.level5"] = { fg = yellow },
-	["@org.tag"] = { fg = p_keyword },
+	["@org.headline.level4"] = { fg = p_parameter },
+	["@org.headline.level5"] = { fg = p_number },
+	["@org.tag"] = { fg = p_parameter },
 	["@org.hyperlink"] = { fg = p_function },
 	["@org.hyperlink.url"] = { fg = p_function },
 	["@org.hyperlink.desc"] = { fg = p_function },
@@ -432,22 +434,22 @@ local theme = lush(function()
 	return {
 		-- Vim internals
 		Normal({ bg = lush_bg, fg = lush_fg }),
-		CursorLine({ bg = Normal.bg.ro(98).li(20) }), -- lighten() can also be called via li()
+		-- CursorLine({ bg = Normal.bg.li(18) }), -- lighten() can also be called via li()
 		Visual({ fg = Normal.bg, bg = Normal.fg }), -- Try pressing v and selecting some text
 		Comment({ fg = p_comment }),
 		Keyword({ fg = p_keyword }),
 		Number = { fg = p_function },
 		String({ fg = p_string }),
 		Function({ fg = p_function }),
-		CursorColumn({ CursorLine }),
-		OkMsg({ fg = hsl(131, 100, 30) }),
+		-- CursorColumn({ CursorLine }),
+		OkMsg({ fg = hsl(159, 100, 30) }),
 		WarningMsg({ fg = hsl(28, 64, 37) }),
 		ErrorMsg({ fg = hsl(0, 100, 50) }),
 		LineNr({ Comment, gui = "italic" }),
 		LineNrBelow({ LineNr }),
 		LineNrAbove({ LineNr }),
-		CursorLineNr({ LineNr, fg = CursorLine.bg.mix(Normal.fg, 64) }),
-		search_base({ bg = hsl(129, 68, 67), fg = hsl(52, 10, 10) }),
+		-- CursorLineNr({ LineNr, fg = CursorLine.bg.mix(Normal.fg, 64) }),
+		search_base({ bg = hsl(52, 52, 52), fg = hsl(52, 10, 10) }),
 		Search({ search_base }),
 		IncSearch({ bg = search_base.bg.ro(-20), fg = search_base.fg.da(90) }),
 	}
